@@ -23,10 +23,11 @@ pub fn inline_mod(input: TokenStream) -> TokenStream {
 
 fn inline_mod_impl(input: TokenStream2, default_path: Option<LitStr>) -> Result<TokenStream2> {
 	let input: ItemMod = parse2(input)?;
-	if input.content.is_some() {
-		return Ok(quote! {
-			::core::compile_error!("This macro only accepts non-inlined modules")
-		});
+	if let Some((brace, _)) = input.content {
+		return Err(Error::new(
+			brace.span,
+			"This macro only accepts non-inlined modules",
+		));
 	}
 	let path = input
 		.attrs
@@ -50,7 +51,10 @@ fn inline_mod_impl(input: TokenStream2, default_path: Option<LitStr>) -> Result<
 		.join(path);
 	}
 	let path_str = path.to_str().unwrap();
-	let root = path_str.strip_suffix("/mod.rs").or_else(|| path_str.strip_suffix(".rs")).unwrap_or(path_str);
+	let root = path_str
+		.strip_suffix("/mod.rs")
+		.or_else(|| path_str.strip_suffix(".rs"))
+		.unwrap_or(path_str);
 	let root = Path::new(root);
 	let ItemMod {
 		ident, vis, attrs, ..
@@ -87,7 +91,7 @@ fn inline_mod_impl(input: TokenStream2, default_path: Option<LitStr>) -> Result<
 	});
 
 	Ok(quote! {
-		const _: &[u8] = ::core::include_bytes!( #path_str ).as_slice();
+		const _: &[::core::primitive::u8] = ::core::include_bytes!( #path_str ).as_slice();
 		#( #attrs )*
 		#vis mod #ident {
 			#( #file_attrs )*
