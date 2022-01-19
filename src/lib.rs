@@ -50,7 +50,7 @@ fn inline_mod_impl(input: TokenStream2, default_path: Option<LitStr>) -> Result<
 		.join(path);
 	}
 	let path_str = path.to_str().unwrap();
-	let root = path_str.strip_suffix(".rs").unwrap_or(path_str);
+	let root = path_str.strip_suffix("/mod.rs").or_else(|| path_str.strip_suffix(".rs")).unwrap_or(path_str);
 	let root = Path::new(root);
 	let ItemMod {
 		ident, vis, attrs, ..
