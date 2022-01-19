@@ -1,0 +1,26 @@
+[package]
+name = "inline-mod"
+version = "0.0.1"
+edition = "2021"
+repository = "https://github.com/nrabulinski/inline-mod"
+license = "MIT"
+categories = ["rust-patterns"]
+description = "Inline modules at macro expansion time"
+readme = "README.md"
+keywords = ["macro"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+syn = { version = "1.0", features = ["full", "extra-traits"] }
+quote = "1.0"
+
+[features]
+default = []
+
+docs = []
+
+[package.metadata.docs.rs]
+features = ["docs"]
